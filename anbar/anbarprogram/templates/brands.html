@@ -1,0 +1,211 @@
+{% extends "menu.html" %}
+{% block title %}Brands{% endblock %}
+
+
+
+{% block content %}
+{% if not request.user.is_superuser and not vcheck %}
+    <meta http-equiv="refresh" content="0;url=/">
+{% endif %}
+
+<div class="card mt-3">
+    <div class="card-content">
+      <div class="row row-group m-0">
+        <div class="col-12 col-lg-6 col-xl-3 border-light">
+          <div class="card-body text-left mx-auto mb-3 mt-3">
+            <h2>
+              <p class="mb-0 text-white big-font">
+                <i class="fa fa-list"></i> Total Brands <span class="float-right">{{ bsay }}</span>
+              </p>
+            </h2>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6 col-xl-3 border-light">
+          <div class="card-body text-left mx-auto mb-3 mt-3">
+            <h2>
+              <p class="mb-0 text-white big-font">
+                <i class="fa fa-shopping-cart"></i> Total Products <span class="float-right">{{ psay }}</span>
+              </p>
+            </h2>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6 col-xl-3 border-light">
+          <div class="card-body text-left mx-auto mb-3 mt-3">
+            <h2>
+              <p class="mb-0 text-white big-font">
+                <i class="fa fa-shopping-basket"></i> Total Orders <span class="float-right">{{ osay }}</span>
+              </p>
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible">
+            <span class="icon"><i class="mdi mdi-message-reply-text"></i></span>
+            {{ message }}
+            {% if delete_id %}
+                {% if request.user.is_superuser %}
+                <a href="{% url 'delete' delete_id  %}" ><button class="btn btn-danger btn-round px-4" title="Delete"><i class="fas fa-check"></i></button></a> 
+                <a href="{% url 'brands'  %}" ><button class="btn btn-warning btn-round px-4" title="Cancel"><i class="fas fa-times"></i></button></a>
+                {% else %}
+                <a href="{% url 'delete' echeck delete_id  %}" ><button class="btn btn-danger btn-round px-4" title="Delete"><i class="fas fa-check"></i></button></a> 
+                <a href="{% url 'brands' echeck request.user.id  %}" ><button name="cancel" class="btn btn-warning btn-round px-4" title="Cancel"><i class="fas fa-times"></i></button></a>
+                {% endif %}
+            {% else %}
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endif %}
+
+    
+
+
+    {% if request.user.is_superuser or echeck %}
+    {% if edit %}
+    <div class="card-body">
+        <div class="card-title">Обновление бренда</div>
+        <hr>
+        <form method="post" {% if request.user.is_superuser %}action="{% url 'update' edit.id %}"{% else %} action="{% url 'update' echeck edit.id %}"{% endif %} enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if edit.photo %}
+                <div class="form-group">
+                    <label for="input-photo">Current photo:</label>
+                    <img src="{{ edit.photo }}" alt="{{ edit.brand }}" width="150" height="150">
+                </div>
+            {% endif %}
+            <div class="form-group">
+                <label for="new_photo">Update photo:</label>
+                <input type="file" class="form-control form-control-rounded" name="new_photo" id="new_photo">
+            </div>
+            <div class="form-group">
+                <label for="brand">Brand:</label>
+                <input type="text" class="form-control form-control-rounded" name="brand" id="brand" value="{{ edit.brand }}">
+            </div>
+            <div class="form-group d-flex">
+                <button type="submit" class="btn btn-light btn-round px-5 mr-2" title="Update brand"><i class="fas fa-sync"></i></button>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'brands' %}" class="btn btn-light btn-round px-5" title="Cancel"><i class="fas fa-times"></i></a>
+                {% else %}
+                <a href="{% url 'brands' echeck request.user.id %}" class="btn btn-light btn-round px-5" title="Cancel"><i class="fas fa-times"></i></a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    
+{% else %}
+    <div class="card-body">
+        <div class="card-title">Add brand</div>
+        <hr>
+        <form method="post" {% if request.user.is_superuser %}action="{% url 'brands' %}"{% else %} action="{% url 'brands' echeck request.user.id %}" {% endif %} enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="photo">Photo:</label>
+                <input type="file" class="form-control form-control-rounded" name="photo" id="photo">
+            </div>
+            <div class="form-group">
+                <label for="brand">Brand:</label>
+                <input type="text" class="form-control form-control-rounded" name="brand" id="brand">
+            </div>
+            <input type="hidden" name="echeck" value="{{ echeck }}">
+                <div class="form-group">
+                    <button type="submit" class="btn btn-light btn-round px-5" title="Add brand"><i class="fas fa-check"></i></button>
+                    <a href="{% url 'export_brands_to_excel' %}" class="btn btn-light btn-round px-5" title="Export Brands">
+                        <i class="fa fa-file-excel"></i>
+                    </a>
+                </div>
+        </form>
+    </div>
+{% endif %}
+{% endif %}
+
+    <br>
+    {% if info %}
+    <form method="post" {% if request.user.is_superuser  %}action="{% url 'delete_selected_brands'  %}"{% else %}action="{% url 'delete_selected_brands' echeck request.user.id %}"{% endif %} enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Brands Table</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                {% if request.user.is_superuser or echeck %}
+                                <th scope="col">Check</th>
+                                {% endif %}
+                                <th scope="col">№</th>
+                                <th scope="col">Photo</th>
+                                <th scope="col">Brand</th>
+                                {% if request.user.is_superuser or echeck %}
+                                <th scope="col">Actions
+                                <button type="submit" class="btn btn-danger btn-sm" name="secsil" {% if not info %}disabled{% endif %}>
+                                    <i class="fas fa-trash-alt" title="Delete choosen brands"></i> 
+                                </button>
+                                </th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                                {% for brand in info %}
+                                    <tr>
+                                        {% if request.user.is_superuser or echeck %}
+                                        <td><input type="checkbox" name="secim[]" value="{{ brand.id }}"></td>
+                                        {% endif %}
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            <img src="{{ brand.photo }}" alt="{{ brand.brand }}" class="circular-image">
+                                        </td>
+                                        <td>{{ brand.brand }}</td>
+                                        {% if request.user.is_superuser or echeck %}
+                                        {% if request.user.is_superuser %}
+                                        <td>
+                                            <a href="{% url 'udalit'  brand.id %}">
+                                                <button type="button" class="btn btn-danger btn-round px-5" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </a>
+                                            <a href="{% url 'edit' brand.id %}">
+                                                <button type="button" class="btn btn-warning btn-round px-5" title="Edit">
+                                                    <i class="fas fa-pen"></i>
+                                                </button>
+                                            </a>     
+                                    </td>
+
+
+                                        {% else %}
+                                        <td>
+                                            <a href="{% url 'udalit' echeck brand.id %}">
+                                                <button type="button" class="btn btn-danger btn-round px-5" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </a>
+                                            <a href="{% url 'edit' echeck brand.id %}">
+                                                <button type="button" class="btn btn-warning btn-round px-5" title="Edit">
+                                                    <i class="fas fa-pen"></i>
+                                                </button>
+                                            </a>
+
+                                    </td>
+
+                                    {% endif %}
+                                    {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+    
+    
+    
+{% endblock %}

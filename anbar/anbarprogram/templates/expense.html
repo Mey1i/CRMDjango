@@ -1,0 +1,167 @@
+{% extends "menu.html" %}
+{% block title %}Expense{% endblock %}
+{% block content %}
+
+{% if not request.user.is_superuser and vcheck is none %}
+    <meta http-equiv="refresh" content="0;url=/">
+{% endif %}
+
+
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible">
+            <span class="icon"><i class="mdi mdi-message-reply-text"></i></span>
+            {{ message }}
+            {% if delete3_id %}
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'delete3' delete3_id  %}"><button class="btn btn-danger btn-round px-4" title="Delete"><i class="fas fa-check"></i></button></a>
+                    <a href="{% url 'expense'  %}" ><button class="btn btn-warning btn-round px-4" title="Cancel"><i class="fas fa-times"></i></button></a>
+                {% else %}
+                    <a href="{% url 'delete3' echeck delete3_id  %}"><button class="btn btn-danger btn-round px-4" title="Delete"><i class="fas fa-check"></i></button></a>
+                    <a href="{% url 'expense' echeck request.user.id %}" ><button class="btn btn-warning btn-round px-4" title="Cancel"><i class="fas fa-times"></i></button></a>
+                {% endif %}
+            {% else %}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endif %}
+    
+
+
+{% if request.user.is_superuser or echeck %} 
+    {% if edit3 %}
+    <div class="card-body">
+        <div class="card-title">Update Expense</div>
+        <hr>
+        <form method="post" {% if request.user.is_superuser %}action="{% url 'update3' edit3.id %}"{% else %} action="{% url 'update3' echeck edit3.id %}"{% endif %}>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="appointment">Appointment:</label>
+                <input type="text" class="form-control form-control-rounded" name="appointment" value="{{ edit3.appointment }}">
+            </div>
+            <div class="form-group">
+                <label for="amount">Amount:</label>
+                <input type="text" class="form-control form-control-rounded" name="amount" value="{{ edit3.amount }}">
+            </div>
+            <div class="form-group d-flex">
+                <button type="submit" class="btn btn-light btn-round px-5" title="Update Expense"><i class="fas fa-sync"></i> </button>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'expense'  %}" class="btn btn-light btn-round px-5" title="Cancel"><i class="fas fa-times"></i></a>
+                {% else %}
+                <a href="{% url 'expense' echeck request.user.id %}" class="btn btn-light btn-round px-5" title="Cancel"><i class="fas fa-times"></i></a>
+                {% endif %}
+            </div>
+        </form><br>
+    </div>
+    {% else %}
+    <div class="card-body">
+        <div class="card-title">Add Expense</div>
+        <hr>
+        <form method="post" {% if request.user.is_superuser %}action="{% url 'expense' %}"{% else %} action="{% url 'expense' echeck request.user.id %}" {% endif %}>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="appointment">Appointment:</label>
+                <input type="text" class="form-control form-control-rounded" name="appointment">
+            </div>
+            <div class="form-group">
+                <label for="amount">Amount:</label>
+                <input type="text" class="form-control form-control-rounded" name="amount">
+            </div>
+            <input type="hidden" name="echeck" value="{{ echeck }}">
+            <div class="form-group">
+                <button type="submit" class="btn btn-light btn-round px-5" title="Add expense"><i class="fas fa-check"></i></button>
+                <a href="{% url 'export_expense_to_excel' %}" class="btn btn-light btn-round px-5" title="Export Expense">
+                    <i class="fa fa-file-excel"></i>
+                </a>
+            </div>
+        </form><br>
+    </div>
+    {% endif %}
+    {% endif %}
+    <br>
+    You have <b>{{ say }}</b> expenses in the base<br><br>
+    
+    {% if info %}
+        {% if request.user.is_superuser %}
+            <form method="post"  action="{% url 'delete_selected_expense' %}">
+        {% else %}
+            {% if echeck %}
+                <form method="post"  action="{% url 'delete_selected_expense' echeck request.user.id %}">
+            {% elif vcheck %}
+                <form method="post"  action="{% url 'delete_selected_expense' vcheck request.user.id %}">
+            {% endif %}
+        {% endif %}
+        {% csrf_token %}
+        <div class="card">
+            <div class card="card-body">
+                <h5 class="card-title">Expenses Table</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                {% if request.user.is_superuser or echeck %}
+                                <th scope="col">Checkbox</th>
+                                {% endif %}
+                                <th scope="col">#</th>
+                                <th scope="col">Appointment</th>
+                                <th scope="col">Amount</th>
+                                {% if request.user.is_superuser or echeck  %}
+                                    <th scope="col">Actions
+                                                <button type="submit" class="btn btn-danger btn-sm" name="secsil" {% if not info %}disabled{% endif %}>
+                                                    <i class="fas fa-trash-alt" title="Delete choosen expenses"></i> 
+                                                </button>
+                                        </th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for expense in info %}
+                                <tr>
+                                    {% if request.user.is_superuser or echeck %}
+                                        <th><input type="checkbox" name="secim[]" value="{{expense.id}}"></th>
+                                    {% endif %}
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <td>{{ expense.appointment }}</td>
+                                    <td>{{ expense.amount }}</td>
+                                    {% if  request.user.is_superuser or echeck %}
+                                    {% if request.user.is_superuser %}
+                                        <td>
+                                            <a href="{% url 'udalit3' expense.id %}">
+                                                <button type="button" class="btn btn-danger btn-round px-5" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </a>
+                                            <a href="{% url 'edit3'  expense.id %}">
+                                                <button type="button" class="btn btn-warning btn-round px-5" title="Edit">
+                                                    <i class="fas fa-pen"></i>
+                                                </button>
+                                            </a>     
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <a href="{% url 'udalit3' echeck expense.id  %}">
+                                                <button type="button" class="btn btn-danger btn-round px-5" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </a>
+                                            <a href="{% url 'edit3'  check=echeck id=expense.id %}">
+                                                <button type="button" class="btn btn-warning btn-round px-5" title="Edit">
+                                                    <i class="fas fa-pen"></i>
+                                                </button>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        </form>
+    {% endif %}
+{% endblock %}
+

@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>SIGN UP</title>
+    <!-- loader-->
+    <link href="{% static 'assets/css/pace.min.css' %}" rel="stylesheet">
+    <script src="{% static 'assets/js/pace.min.js' %}"></script>
+    <!--favicon-->
+    <link rel="icon" href="{% static 'assets/images/favicon.ico' %}" type="image/x-icon">
+    <!-- Bootstrap core CSS-->
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- animate CSS-->
+    <link href="{% static 'assets/css/animate.css' %}" rel="stylesheet" type="text/css">
+    <!-- Icons CSS-->
+    <link href="{% static 'assets/css/icons.css' %}" rel="stylesheet" type="text/css">
+    <!-- Custom Style-->
+    <link href="{% static 'assets/css/app-style.css' %}" rel="stylesheet">
+</head>
+
+<body class="bg-theme bg-theme1  pace-done">
+    <div class="pace  pace-inactive">
+        <div class="pace-progress" data-progress-text="100%" data-progress="99" style="transform: translate3d(100%, 0px, 0px);">
+            <div class="pace-progress-inner"></div>
+        </div>
+        <div class="pace-activity"></div>
+    </div>
+
+    <!-- start loader -->
+    <div id="pageloader-overlay" class="visible incoming">
+        <div class="loader-wrapper-outer">
+            <div class="loader-wrapper-inner">
+                <div class="loader"></div>
+            </div>
+        </div>
+    </div>
+    <!-- end loader -->
+
+    <!-- Start wrapper-->
+    <div id="wrapper">
+        <div class="card card-authentication1 mx-auto my-4">
+            <div class="card-body">
+                <div class="card-content p-2">
+                    <div class="text-center">
+                        <img src="{% static 'assets/images/logo-icon.png' %}" alt="logo icon">
+                    </div>
+                    {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert {{ message.tags }} alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                    <div class="card-title text-uppercase text-center py-3">Sign Up</div>
+                    <form method="post" action="{% url 'contact' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="exampleInputName" class="sr-only">Name</label>
+                            <div class="position-relative has-icon-right">
+                                <input type="text" id="exampleInputName" class="form-control input-shadow" placeholder="Enter Your Name" name="name">
+                                <div class="form-control-position">
+                                    <i class="icon-user"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmailId" class="sr-only">Email ID</label>
+                            <div class="position-relative has-icon-right">
+                                <input type="text" id="exampleInputEmailId" class="form-control input-shadow" placeholder="Enter Your Email ID" name="email">
+                                <div class="form-control-position">
+                                    <i class="icon-envelope-open"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPhone" class="sr-only">Phone Number</label>
+                            <div class="position-relative has-icon-right">
+                                <input type="text" id="exampleInputPhone" class="form-control input-shadow" placeholder="Enter Your Phone Number" name="phone">
+                                <div class="form-control-position">
+                                    <i class="icon-phone"></i> <!-- Замените "icon-phone" на класс вашей иконки телефона -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="exampleInputPassword" class="sr-only">Message</label>
+                            <div class="position-relative has-icon-right">
+                                <textarea type="text" id="exampleInputText" class="form-control input-shadow" placeholder="Enter your message" name="text"></textarea>
+                                <div class="form-control-position">
+                                    <i class="icon-lock"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-light btn-block waves-effect waves-light">Sign Up</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card-footer text-center py-3">
+                <p class="text-warning mb-0">Problem has been solved? <a href="{% url 'login' %}"> Sign In here</a></p>
+            </div>
+        </div>
+
+        <!--Start Back To Top Button-->
+        <a href="javaScript:void();" class="back-to-top"><i class="fa fa-angle-double-up"></i> </a>
+        <!--End Back To Top Button-->
+    </div><!--wrapper-->
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/popper.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+    
+    <!-- sidebar-menu js -->
+    <script src="{% static 'assets/js/sidebar-menu.js' %}"></script>
+    
+    <!-- Custom scripts -->
+    <script src="{% static 'assets/js/app-script.js' %}"></script>
+
+
+
+    <style>
+        .circular-image {
+            border-radius: 50%;
+            width: 100px; /* Adjust the width and height to your preferred size */
+            height: 100px;
+            object-fit: cover; /* This ensures the image covers the circular shape */
+        }
+    
+        .search-bar {
+        display: flex; /* Используйте flex-контейнер для выравнивания элементов */
+        align-items: center; /* Выравнивание по вертикали */
+    }
+    
+    .search-bar input[type="text"] {
+        flex: 1; /* Расширьте входное поле, чтобы заполнить доступное пространство */
+    }
+    
+    .search-bar button {
+        background: none; /* Уберите фон у кнопки */
+        border: none; /* Уберите границу у кнопки */
+        cursor: pointer;
+    }
+    
+        .alert {
+            padding: 20px; /* Увеличьте отступы вокруг текста внутри алерта */
+            margin-bottom: 20px; /* Увеличьте внешний отступ снизу алерта */
+            border-radius: 10px; /* Закруглите углы для создания более прямоугольной формы */
+        }
+    
+        .icon {
+            margin-right: 10px; /* Увеличьте отступ между иконкой и текстом */
+        }
+        
+    
+        .footer {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+    }
+    </style>
+</body>
+</html>

@@ -1,0 +1,329 @@
+{% extends "menu.html" %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+
+{% if not request.user.is_superuser and vcheck is none %}
+    <meta http-equiv="refresh" content="0;url=/">
+{% endif %}
+
+<div class="card mt-3">
+    <div class="card-content">
+      <div class="row row-group m-0">
+        <div class="col-12 col-lg-6 col-xl-3 border-light">
+          <div class="card-body text-left mx-auto mb-3 mt-3">
+            <h2>
+              <p class="mb-0 text-white big-font">
+                <i class="fa fa-list"></i> Total Brands <span class="float-right">{{ bsay }}</span>
+              </p>
+            </h2>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6 col-xl-3 border-light">
+            <div class="card-body text-left mx-auto mb-3 mt-3">
+              <h2>
+                <p class="mb-0 text-white big-font">
+                  <i class="fa fa-people"></i> Total Clients <span class="float-right">{{ csay }}</span>
+                </p>
+              </h2>
+            </div>
+          </div>
+        <div class="col-12 col-lg-6 col-xl-3 border-light">
+          <div class="card-body text-left mx-auto mb-3 mt-3">
+            <h2>
+              <p class="mb-0 text-white big-font">
+                <i class="fa fa-shopping-cart"></i> Total Products <span class="float-right">{{ psay }}</span>
+              </p>
+            </h2>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6 col-xl-3 border-light">
+          <div class="card-body text-left mx-auto mb-3 mt-3">
+            <h2>
+              <p class="mb-0 text-white big-font">
+                <i class="fa fa-shopping-basket"></i> Total Orders <span class="float-right">{{ osay }}</span>
+              </p>
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  {% if messages %}
+  {% for message in messages %}
+      <div class="alert {{ message.tags }} alert-dismissible">
+          <span class="icon"><i class="mdi mdi-message-reply-text"></i></span>
+          {{ message }}
+          {% if delete4_id %}
+              {% if request.user.is_superuser %}
+                  <a href="{% url 'delete4' delete4_id  %}"><button class="btn btn-danger btn-round px-4" title="Delete"><i class="fas fa-check"></i></button></a>
+                  <a href="{% url 'orders'  %}" ><button class="btn btn-warning btn-round px-4" title="Cancel"><i class="fas fa-times"></i></button></a>
+              {% else %}
+                  <a href="{% url 'delete4' check=echeck id=delete4_id  %}"><button class="btn btn-danger btn-round px-4" title="Delete"><i class="fas fa-check"></i></button></a>
+                  <a href="{% url 'orders' check=echeck user_id=request.user.id %}" ><button class="btn btn-warning btn-round px-4" title="Cancel"><i class="fas fa-times"></i></button></a>
+              {% endif %}
+          {% else %}
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+          {% endif %}
+      </div>
+  {% endfor %}
+{% endif %}
+
+
+{% if request.user.is_superuser or echeck %} 
+    {% if edit4 %}
+    <div class="card-body">
+        <div class="card-title">Update Order</div>
+        <hr>
+        <form method="post" {% if request.user.is_superuser %}action="{% url 'update4' edit4.id %}"{% else %} action="{% url 'update4' check=echeck id=edit4.id %}"{% endif %}>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="product">Product:</label>
+                <select name="product_id" class="form-control form-control-rounded">
+                    <option value="">Choose Product</option>
+                    {% for p in pinfo %}
+                        <option value="{{ p.id }}" {% if p.id == edit4.product_id.id %}selected{% endif %}>{{ p.brand_id.brand }}-{{ p.name }} [{{ p.quantity }}]</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="client">Client:</label>
+                <select name="client_id" class="form-control form-control-rounded">
+                    <option value="">Choose Client</option>
+                    {% for c in cinfo %}
+                        <option value="{{ c.id }}" {% if c.id == edit4.client_id.id %}selected{% endif %}>{{ c.name }} {{ c.surname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantity:</label>
+                <input type="text" class="form-control form-control-rounded" name="quantity" value="{{ edit4.quantity }}">
+            </div>
+            <div class="form-group d-flex">
+                <button type="submit" class="btn btn-light btn-round px-5" title="Update Order"><i class="fas fa-sync"></i> </button>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'orders'  %}" class="btn btn-light btn-round px-5" title="Cancel"><i class="fas fa-times"></i></a>
+                {% else %}
+                <a href="{% url 'orders' check=echeck user_id=request.user.id %}" class="btn btn-light btn-round px-5" title="Cancel"><i class="fas fa-times"></i></a>
+                {% endif %}
+            </div>
+        </form><br>
+    </div>
+    {% else %}
+    <div class="card-body">
+        <div class="card-title">Add Order</div>
+        <hr>
+        <form method="post" {% if request.user.is_superuser %}action="{% url 'orders' %}"{% else %} action="{% url 'orders' check=echeck user_id=request.user.id %}" {% endif %}>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="product">Product:</label>
+                <select name="product_id" class="form-control form-control-rounded">
+                    <option value="">Choose Product</option>
+                    {% for p in pinfo %}
+                        <option value="{{ p.id }}">{{ p.brand_id.brand }}-{{ p.name }} [{{ p.quantity }}]</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="client">Client:</label>
+                <select name="client_id" class="form-control form-control-rounded">
+                    <option value="">Choose Client</option>
+                    {% for c in cinfo %}
+                        <option value="{{ c.id }}">{{ c.name }} {{ c.surname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantity:</label>
+                <input type="text" class="form-control form-control-rounded" name="quantity">
+            </div>
+            <input type="hidden" name="echeck" value="{{ echeck }}">
+            <div class="form-group">
+                <button type="submit" class="btn btn-light btn-round px-5" title="Add brand"><i class="fas fa-check"></i></button>
+                <a href="{% url 'export_orders_to_excel' %}" class="btn btn-light btn-round px-5" title="Export Brands">
+                    <i class="fa fa-file-excel"></i>
+                </a>
+            </div>
+        </form><br>
+    </div>
+    {% endif %}
+{% endif %}
+
+    {% if request.user.is_superuser %}
+        <a href="{% url 'orders' %}" class="btn btn-light form-control-rounded">All Orders</a>
+        <a href="{% url 'orders_with_filter' 'active' %}" class="btn btn-light form-control-rounded">Non-Accepted Orders</a>
+        <a href="{% url 'orders_with_filter' 'complete' %}" class="btn btn-light form-control-rounded">Accepted Orders</a><br><br>
+    {% else %}
+    {% if echeck %}
+        <a href="{% url 'orders' check=echeck user_id=request.user.id %}" class="btn btn-light form-control-rounded">All Orders</a>
+        <a href="{% url 'orders_with_filter' check=echeck user_id=request.user.id filter_status='active' %}" class="btn btn-light form-control-rounded">Non-Accepted Orders</a>
+        <a href="{% url 'orders_with_filter' check=echeck   user_id=request.user.id filter_status='complete' %}" class="btn btn-light form-control-rounded">Accepted Orders</a><br><br>
+        {% endif %}
+    {% endif %}
+    You have <b>{{ say }}</b> orders in the base, <b>{{ active_count }}</b> non-accepted orders, and <b>{{ completed_count }}</b> accepted orders<br>
+
+    {% if info %}
+<form method="post">
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Orders Table</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                {% if request.user.is_superuser or echeck %}
+                                <th scope="col">Checkbox</th>
+                                {% endif %}
+                                <th scope="col">№</th>
+                                <th scope="col">Product</th>
+                                <th scope="col">Client</th>
+                                <th scope="col">Purchase</th>
+                                <th scope="col">Sale</th>
+                                <th scope="col">Amount</th>
+                                <th scope="col">Quantity</th>
+                                {% if request.user.is_superuser or echeck  %}
+                                {% if request.user.is_superuser %}
+                                <form method="post"  action="{% url 'delete_selected_orders' %}">
+                                    {% else %}
+                                        {% if echeck %}
+                                            <form method="post"  action="{% url 'delete_selected_orders' check=echeck user_id=request.user.id %}">
+                                        {% elif vcheck %}
+                                            <form method="post"  action="{% url 'delete_selected_orders' check=vcheck user_id=request.user.id %}">
+                                        {% endif %}
+                                    {% endif %}
+                                    <th scope="col">Actions
+                                                <button type="submit" class="btn btn-danger btn-sm" name="secsil" {% if not info %}disabled{% endif %}>
+                                                    <i class="fas fa-trash-alt" title="Delete choosen clients"></i> 
+                                                </button>
+                                        </th>
+                                    </form>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            {% for order in info %}
+                                <tr>
+                                    {% if request.user.is_superuser or echeck %}
+                                        <th><input type="checkbox" name="secim[]" value="{{order.id}}"></th>
+                                    {% endif %}
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <td>{{ order.product_id.brand_id.brand }}-{{ order.product_id.name }} [{{ order.product_id.quantity }}]</td>
+                                    <td>{{ order.client_id.name }} {{ order.client_id.surname }}</td>
+                                    <td>{{ order.product_id.purchase }}</td>
+                                    <td>{{ order.product_id.sale }}</td>
+                                    <td>{{ order.product_id.quantity }}</td>
+                                    <td>{{ order.quantity }}</td>
+                                    <td>
+    {% if not request.user.is_superuser %}
+        {% if echeck %}
+            {% if order.accept == 0 %}
+                <form method="post" action="{% url 'accept_order'  order_id=order.id  check=echeck %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="oid" value="{{ order.id }}">
+                    <input type="hidden" name="pid" value="{{ order.product_id.id }}">
+                    <input type="hidden" name="oquaid" value="{{ order.quantity }}">
+                    <input type="hidden" name="opqid" value="{{ order.product_id.quantity }}">
+
+                    <label class="btn btn-success btn-round px-5" title="Accept Order" for="accept-form-submit-{{ order.id }}">
+                        <i class="fas fa-check"></i>
+                    </label>
+
+                    <button type="submit" id="accept-form-submit-{{ order.id }}" style="display: none;"></button>
+
+                    </form>
+                    
+                    <form method="post" action="{% url 'udalit4' check=echeck id=order.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <label class="btn btn-danger btn-round px-5" title="Delete" for="delete-form-submit-{{ order.id }}">
+                            <i class="fas fa-trash"></i>
+                        </label>
+                        <button type="submit" id="delete-form-submit-{{ order.id }}" style="display: none;"></button>
+                    </form>
+
+                    <form method="post" action="{% url 'edit4' check=echeck id=order.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <label class="btn btn-warning btn-round px-5" title="Edit" for="edit-form-submit-{{ order.id }}">
+                            <i class="fas fa-pen"></i>
+                        </label>
+                        <button type="submit" id="edit-form-submit-{{ order.id }}" style="display: none;"></button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <form method="post" action="{% url 'cancel_order'  order_id=order.id check=echeck %}" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="oid" value="{{ order.id }}">
+                <input type="hidden" name="pid" value="{{ order.product_id.id }}">
+                <input type="hidden" name="oquaid" value="{{ order.quantity }}">
+                <input type="hidden" name="opqid" value="{{ order.product_id.quantity }}">
+
+                <label class="btn btn-primary btn-round px-5" title="Cancel Order" for="cancel-form-submit-{{ order.id }}">
+                    <i class="fas fa-times"></i>
+                </label>
+                <button type="submit" id="cancel-form-submit-{{ order.id }}" style="display: none;"></button>
+            </form>
+        {% endif %}
+    {% endif %}
+{% else %}
+    {% if order.accept == 0 %}
+    <form method="post" action="{% url 'accept_order' order.id %}" style="display: inline;">
+        {% csrf_token %}
+        <input type="hidden" name="oid" value="{{ order.id }}">
+        <input type="hidden" name="pid" value="{{ order.product_id.id }}">
+        <input type="hidden" name="oquaid" value="{{ order.quantity }}">
+        <input type="hidden" name="opqid" value="{{ order.product_id.quantity }}">
+
+        <label class="btn btn-success btn-round px-5" title="Accept Order" for="accept-form-submit-{{ order.id }}">
+            <i class="fas fa-check"></i>
+        </label>
+
+        <button type="submit" id="accept-form-submit-{{ order.id }}" style="display: none;"></button>
+
+        </form>
+        
+        <form method="post" action="{% url 'udalit4' id=order.id %}" style="display: inline;">
+            {% csrf_token %}
+            <label class="btn btn-danger btn-round px-5" title="Delete" for="delete-form-submit-{{ order.id }}">
+                <i class="fas fa-trash"></i>
+            </label>
+            <button type="submit" id="delete-form-submit-{{ order.id }}" style="display: none;"></button>
+        </form>
+        <form method="post" action="{% url 'edit4' id=order.id %}" style="display: inline;">
+            {% csrf_token %}
+            <label class="btn btn-warning btn-round px-5" title="Edit" for="edit-form-submit-{{ order.id }}">
+                <i class="fas fa-pen"></i>
+            </label>
+            <button type="submit" id="edit-form-submit-{{ order.id }}" style="display: none;"></button>
+        </form>
+    </td>
+    </tr>
+    {% else %}
+    <form method="post" action="{% url 'cancel_order' order.id %}" style="display: inline;">
+    {% csrf_token %}
+    <input type="hidden" name="oid" value="{{ order.id }}">
+    <input type="hidden" name="pid" value="{{ order.product_id.id }}">
+    <input type="hidden" name="oquaid" value="{{ order.quantity }}">
+    <input type="hidden" name="opqid" value="{{ order.product_id.quantity }}">
+
+    <label class="btn btn-primary btn-round px-5" title="Cancel Order" for="cancel-form-submit-{{ order.id }}">
+        <i class="fas fa-times"></i>
+    </label>
+    <button type="submit" id="cancel-form-submit-{{ order.id }}" style="display: none;"></button>
+    </form>
+    {% endif %}
+{% endif %}
+</td>
+</tr>
+
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</form>
+{% endif %}
+{% endblock %}

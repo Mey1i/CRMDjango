@@ -1,0 +1,219 @@
+{% extends "menu.html" %}
+{% block title %}Planner{% endblock %}
+{% block content %}
+
+{% if not request.user.is_superuser and vcheck is none %}
+    <meta http-equiv="refresh" content="0;url=/">
+{% endif %}
+
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible">
+            <span class="icon"><i class="mdi mdi-message-reply-text"></i></span>
+            {{ message }}
+            {% if delete5_id %}
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'delete5' delete5_id  %}"><button class="btn btn-danger btn-round px-4" title="Delete"><i class="fas fa-check"></i></button></a>
+                    <a href="{% url 'planner'  %}" ><button class="btn btn-warning btn-round px-4" title="Cancel"><i class="fas fa-times"></i></button></a>
+                {% else %}
+                    <a href="{% url 'delete5' echeck delete5_id  %}"><button class="btn btn-danger btn-round px-4" title="Delete"><i class="fas fa-check"></i></button></a>
+                    <a href="{% url 'planner' echeck request.user.id %}" ><button class="btn btn-warning btn-round px-4" title="Cancel"><i class="fas fa-times"></i></button></a>
+                {% endif %}
+            {% else %}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+
+{% if request.user.is_superuser or echeck %} 
+    {% if edit5 %}
+    <div class="card-body">
+        <div class="card-title">Update Task</div>
+        <hr>
+    <form method="post" {% if request.user.is_superuser %}action="{% url 'update5' edit5.id %}" {% else %} action="{% url 'update5' echeck edit5.id %}"{% endif %}>
+        {% csrf_token %}
+        Staff:<br>
+        <select name="staff_id" class="form-control form-control-rounded">
+            <option value="">Choose Staff</option>
+            {% for s in sinfo %}
+                <option value="{{ s.id }}" {% if s.id == edit5.staff_id.id %}selected{% endif %}>{{ s.name }} {{ s.surname }}</option>
+            {% endfor %}
+        </select><br>
+        Task:<br>
+        <input type="text" name="task" value="{{ edit5.task }}" class="form-control form-control-rounded"><br>
+        Date:<br>
+        <input type="date" name="dtask" value="{{ edit5.dtask|date:'Y-m-d' }}" class="form-control form-control-rounded"><br>
+        Time:<br>
+        <input type="time" name="ttask" value="{{ edit5.ttask|time:'H:i' }}" class="form-control form-control-rounded"><br>
+        <div class="form-group d-flex">
+            <button type="submit" class="btn btn-light btn-round px-5" title="Update Task"><i class="fas fa-sync"></i> </button>
+            {% if request.user.is_superuser %}
+            <a href="{% url 'planner'  %}" class="btn btn-light btn-round px-5" title="Cancel"><i class="fas fa-times"></i></a>
+            {% else %}
+            <a href="{% url 'planner' check=echeck user_id=request.user.id %}" class="btn btn-light btn-round px-5" title="Cancel"><i class="fas fa-times"></i></a>
+            {% endif %}
+        </div>
+    </form><br>
+    </div>
+
+    {% else %}
+
+
+    <div class="card-body">
+        <div class="card-title">Add Task</div>
+        <hr>
+    <form method="post" {% if request.user.is_superuser %}action="{% url 'planner' %}"{% else %} action="{% url 'planner' echeck request.user.id %}" {% endif %}>
+        {% csrf_token %}
+        Staff:<br>
+        <select name="staff_id" class="form-control form-control-rounded">
+            <option value="">Choose Staff</option>
+            {% for s in sinfo %}
+                <option value="{{ s.id }}">{{ s.name }} {{ s.surname }}</option>
+            {% endfor %}
+        </select><br>
+        Task:<br>
+        <input type="text" name="task" class="form-control form-control-rounded"><br>
+        Date:<br>
+        <input type="date" name="dtask" class="form-control form-control-rounded"><br>
+        Time:<br>
+        <input type="time" name="ttask" class="form-control form-control-rounded"><br>
+        <input type="hidden" name="echeck" value="{{ echeck }}">
+        <div class="form-group">
+            <button type="submit" class="btn btn-light btn-round px-5" title="Add task"><i class="fas fa-check"></i></button>
+            <a href="{% url 'export_planner_to_excel' %}" class="btn btn-light btn-round px-5" title="Export Planner">
+                <i class="fa fa-file-excel"></i>
+            </a>
+        </div>
+    </form><br>
+    </div>
+    {% endif %}
+{% endif %}
+    {% if not request.user.is_superuser %}
+        {% if echeck %}
+        <a href="{% url 'planner' echeck request.user.id %}" class="btn btn-light form-control-rounded">All Tasks</a>
+        <a href="{% url 'planner_with_filter' check=echeck user_id=request.user.id filter_status='active' %}" class="btn btn-light form-control-rounded">Active tasks</a>
+        <a href="{% url 'planner_with_filter' check=echeck user_id=request.user.id filter_status='complete' %}" class="btn btn-light form-control-rounded">Complete tasks</a><br><br>     
+        {% endif %}
+    {% else %}
+    <a href="{% url 'planner'  %}" class="btn btn-light form-control-rounded">All Tasks</a>
+    <a href="{% url 'planner_with_filter'  filter_status='active' %}" class="btn btn-light form-control-rounded">Active Tasks</a>
+    <a href="{% url 'planner_with_filter'  filter_status='complete' %}" class="btn btn-light form-control-rounded">Complete Tasks</a><br><br>
+    {% endif %}
+
+    You have <b>{{ say }}</b> tasks in the base, <b>{{ active_count }}</b> active tasks, and <b>{{ completed_count }}</b> completed tasks<br><br>
+
+    {% if info %}
+        {% if request.user.is_superuser %}
+            <form method="post"  action="{% url 'delete_selected_planner' %}">
+        {% else %}
+            {% if echeck %}
+                <form method="post"  action="{% url 'delete_selected_planner' echeck request.user.id %}">
+            {% elif vcheck %}
+                <form method="post"  action="{% url 'delete_selected_planner' vcheck request.user.id %}">
+            {% endif %}
+        {% endif %}
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Tasks Table</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                {% if request.user.is_superuser or echeck %}
+                                <th scope="col">Checkbox</th>
+                                {% endif %}
+                                <th scope="col">#</th>
+                                <th scope="col">Staff</th>
+                                <th scope="col">Task</th>
+                                <th scope="col">Date</th>
+                                <th scope="col">Time</th>
+                                <th scope="col">Remaining Time</th>
+                                {% if request.user.is_superuser or echeck  %}
+                                    <th scope="col">Actions
+                                                <button type="submit" class="btn btn-danger btn-sm" name="secsil" {% if not info %}disabled{% endif %}>
+                                                    <i class="fas fa-trash-alt" title="Delete choosen tasks"></i> 
+                                                </button>
+                                        </th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for planner in info %}
+                                <tr>
+                                    {% if request.user.is_superuser or echeck %}
+                                    <th><input type="checkbox" name="secim[]" value="{{planner.id}}"></th>
+                                    {% endif %}
+                                    <td scope="row">{{ forloop.counter }}</td>
+                                        <td>{{ planner.staff_id.name }} {{ planner.staff_id.surname }}</td>
+                                        <td>{{ planner.task }}</td>
+                                        <td>{{ planner.dtask }}</td>
+                                        <td>{{ planner.ttask }}</td>
+                                        <td>{{ planner.remaining_time }}</td>
+                                    <td>
+                                    {% if request.user.is_superuser %}
+                                        {% if not echeck %}
+                                            {% if planner.accept == 0 %}
+                                            <a href="{% url 'accept_task' planner.id %}">
+                                                <button type="button" class="btn btn-success btn-round px-5" title="Accept">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </a>
+                                            <a href="{% url 'udalit5'  planner.id %}">
+                                                <button type="button" class="btn btn-danger btn-round px-5" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </a>
+                                            <a href="{% url 'edit5' planner.id %}">
+                                                <button type="button" class="btn btn-warning btn-round px-5" title="Edit">
+                                                    <i class="fas fa-pen"></i>
+                                                </button>
+                                            </a>
+                                            {% else %}
+                                            <a href="{% url 'cancel_task' planner.id %}">
+                                                <button type="button" class="btn btn-primary btn-round px-5" title="Cancel">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </a>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% else %}
+                                    {% if planner.accept == 0 %}
+                                    <a href="{% url 'accept_task' planner.id echeck %}">
+                                        <button type="button" class="btn btn-success btn-round px-5" title="Accept">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </a>
+                                    <a href="{% url 'udalit5' check=echeck id=planner.id %}">
+                                        <button type="button" class="btn btn-danger btn-round px-5" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </a>
+                                    <a href="{% url 'edit5' echeck planner.id %}">
+                                        <button type="button" class="btn btn-warning btn-round px-5" title="Edit">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                    </a>
+                                    {% else %}
+                                    <a href="{% url 'cancel_task' planner.id echeck %}">
+                                        <button type="button" class="btn btn-primary btn-round px-5" title="Cancel">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </a>
+                                    {% endif %}
+                                    {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        </form>
+    {% endif %}
+{% endblock %}

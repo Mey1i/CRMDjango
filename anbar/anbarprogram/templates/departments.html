@@ -1,0 +1,193 @@
+{% extends "menu.html" %}
+{% block title %}Departments{% endblock %}
+{% block content %}
+
+{% if not request.user.is_superuser and vcheck is none %}
+    <meta http-equiv="refresh" content="0;url=/">
+{% endif %}
+
+<div class="card mt-3">
+    <div class="card-content">
+        <div class="row row-group m-0">
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+                <div class="card-body text-left mx-auto mb-3 mt-3">
+                    <h2>
+                        <p class="mb-0 text-white big-font">
+                            <i class="fas fa-building"></i> Total Departments <span class="float-right">{{ dsay }}</span>
+                        </p>
+                    </h2>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+                <div class="card-body text-left mx-auto mb-3 mt-3">
+                    <h2>
+                        <p class="mb-0 text-white big-font">
+                            <i class="fas fa-user-tie"></i> Total Positions <span class="float-right">{{ psay }}</span>
+                        </p>
+                    </h2>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+                <div class="card-body text-left mx-auto mb-3 mt-3">
+                    <h2>
+                        <p class="mb-0 text-white big-font">
+                            <i class="fas fa-users"></i> Total Staff <span class="float-right">{{ ssay }}</span>
+                        </p>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible">
+            <span class="icon"><i class="mdi mdi-message-reply-text"></i></span>
+            {{ message }}
+            {% if delete2_id %}
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'delete2' delete2_id  %}"><button class="btn btn-danger btn-round px-4" title="Delete"><i class="fas fa-check"></i></button></a>
+                    <a href="{% url 'departments'  %}" ><button class="btn btn-warning btn-round px-4" title="Cancel"><i class="fas fa-times"></i></button></a>
+                {% else %}
+                    <a href="{% url 'delete2' echeck delete2_id  %}"><button class="btn btn-danger btn-round px-4" title="Delete"><i class="fas fa-check"></i></button></a>
+                    <a href="{% url 'departments' echeck request.user.id %}" ><button class="btn btn-warning btn-round px-4" title="Cancel"><i class="fas fa-times"></i></button></a>
+                {% endif %}
+            {% else %}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+{% if request.user.is_superuser or echeck %}    
+    {% if edit2 %}
+    <div class="card-body">
+        <div class="card-title">Update Department</div>
+        <hr>
+        <form method="post" {% if request.user.is_superuser %}action="{% url 'update2' edit2.id %}"{% else %} action="{% url 'update2' echeck edit2.id %}"{% endif %}>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="department">Department:</label>
+                <input type="text" class="form-control form-control-rounded" name="department" id="department" value="{{ edit2.department }}">
+            </div>
+            <div class="form-group d-flex">
+                <button type="submit" class="btn btn-light btn-round px-5" title="Update Department"><i class="fas fa-sync"></i></button>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'departments'  %}" class="btn btn-light btn-round px-5" title="Cancel"><i class="fas fa-times"></i></a>
+                {% else %}
+                <a href="{% url 'departments' echeck request.user.id  %}" class="btn btn-light btn-round px-5" title="Cancel"><i class="fas fa-times"></i></a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    {% else %}
+    <div class="card-body">
+        <div class="card-title">Add Department</div>
+        <hr>
+        <form method="post" {% if request.user.is_superuser %}action="{% url 'departments' %}"{% else %} action="{% url 'departments' echeck request.user.id %}" {% endif %} enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="department">Department:</label>
+                <input type="text" class="form-control form-control-rounded" name="department" id="department">
+            </div>
+            <input type="hidden" name="echeck" value="{{ echeck }}">
+            <div class="form-group">
+                <button type="submit" class="btn btn-light btn-round px-5" title="Add department"><i class="fas fa-check"></i></button>
+                <a href="{% url 'export_departments_to_excel' %}" class="btn btn-light btn-round px-5" title="Export Departments">
+                    <i class="fa fa-file-excel"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+        {% endif %}
+    {% endif %}
+
+
+
+    {% if info %}
+    {% if request.user.is_superuser %}
+        <form method="post"  action="{% url 'delete_selected_departments' %}">
+    {% else %}
+        {% if echeck %}
+            <form method="post" action="{% url 'delete_selected_departments' echeck request.user.id %}">
+        {% elif vcheck %}
+            <form method="post"  action="{% url 'delete_selected_departments' vcheck request.user.id %}">
+        {% endif %}
+    {% endif %}
+        {% csrf_token %}
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Departments Table</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            {% if request.user.is_superuser or echeck %}
+                            <th scope="col">Checkbox</th>
+                            {% endif %}
+                            <th scope="col">№</th>
+                            <th scope="col">Department</th>
+                                {% if request.user.is_superuser or echeck  %}
+                                    <th scope="col">Actions
+                                                <button type="submit" class="btn btn-danger btn-sm" name="secsil" {% if not info %}disabled{% endif %}>
+                                                    <i class="fas fa-trash-alt" title="Delete choosen departments"></i> 
+                                                </button>
+                                        </th>
+                                {% endif %}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                            {% for department in info %}
+                                <tr>
+                                    {% if request.user.is_superuser or echeck %}
+                                        <th><input type="checkbox" name="secim[]" value="{{department.id}}"></th>
+                                    {% endif %}
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <td>{{ department.department }}</td>
+                                    {% if  request.user.is_superuser or echeck %}
+                                        {% if request.user.is_superuser %}
+                                            <td>
+                                                <a href="{% url 'udalit2'  department.id %}">
+                                                    <button type="button" class="btn btn-danger btn-round px-5" title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </a>
+                                                <a href="{% url 'edit2'  department.id %}">
+                                                    <button type="button" class="btn btn-warning btn-round px-5" title="Edit">
+                                                        <i class="fas fa-pen"></i>
+                                                    </button>
+                                                </a>     
+                                            </td>
+                                        {% else %}
+                                            <td>
+                                                <a href="{% url 'udalit2' echeck department.id  %}">
+                                                    <button type="button" class="btn btn-danger btn-round px-5" title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </a>
+                                                <a href="{% url 'edit2'  echeck department.id %}">
+                                                    <button type="button" class="btn btn-warning btn-round px-5" title="Edit">
+                                                        <i class="fas fa-pen"></i>
+                                                    </button>
+                                                </a>
+                                            </td>
+                                        {% endif %}
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </form>
+    {% endif %}
+{% endblock %}

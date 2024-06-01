@@ -1,0 +1,243 @@
+{% extends "menu.html" %}
+{% block title %}Staff{% endblock %}
+{% block content %}
+
+{% if not request.user.is_superuser and vcheck is none %}
+    <meta http-equiv="refresh" content="0;url=/">
+{% endif %}
+
+
+<div class="card mt-3">
+    <div class="card-content">
+        <div class="row row-group m-0">
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+                <div class="card-body text-left mx-auto mb-3 mt-3">
+                    <h2>
+                        <p class="mb-0 text-white big-font">
+                            <i class="fas fa-building"></i> Total Departments <span class="float-right">{{ dsay }}</span>
+                        </p>
+                    </h2>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+                <div class="card-body text-left mx-auto mb-3 mt-3">
+                    <h2>
+                        <p class="mb-0 text-white big-font">
+                            <i class="fas fa-user-tie"></i> Total Positions <span class="float-right">{{ psay }}</span>
+                        </p>
+                    </h2>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+                <div class="card-body text-left mx-auto mb-3 mt-3">
+                    <h2>
+                        <p class="mb-0 text-white big-font">
+                            <i class="fas fa-users"></i> Total Staff <span class="float-right">{{ ssay }}</span>
+                        </p>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible">
+            <span class="icon"><i class="mdi mdi-message-reply-text"></i></span>
+            {{ message }}
+            {% if delete8_id %}
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'delete8' delete8_id  %}"><button class="btn btn-danger btn-round px-4" title="Delete"><i class="fas fa-check"></i></button></a>
+                    <a href="{% url 'staff'  %}" ><button class="btn btn-warning btn-round px-4" title="Cancel"><i class="fas fa-times"></i></button></a>
+                {% else %}
+                    <a href="{% url 'delete8' echeck delete8_id  %}"><button class="btn btn-danger btn-round px-4" title="Delete"><i class="fas fa-check"></i></button></a>
+                    <a href="{% url 'staff' echeck request.user.id %}" ><button class="btn btn-warning btn-round px-4" title="Cancel"><i class="fas fa-times"></i></button></a>
+                {% endif %}
+            {% else %}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+{% if request.user.is_superuser or echeck %} 
+    {% if edit8 %}
+        <div class="card-body">
+            <div class="card-title">Update Staff</div>
+            <hr>
+            <form method="post" {% if request.user.is_superuser %}action="{% url 'update8' edit8.id %}"{% else %} action="{% url 'update8' echeck edit8.id %}"{% endif %} enctype="multipart/form-data">
+                {% csrf_token %}
+                {% if edit8.photo %}
+                    Current Photo:<br>
+                    <img src="{{ edit8.photo }}" alt="{{ edit8.name }} {{ edit8.surname }}" width="150" height="150" class="circular-image"><br>
+                {% endif %}
+                Update Photo:<br>
+                <input type="file" name="new_photo" class="form-control form-control-rounded"><br><br>
+                Worker's title:<br>
+                <select name="position_id" class="form-control form-control-rounded">
+                    <option value="">Choose Title</option>
+                    {% for p in pinfo %}
+                        <option value="{{ p.id }}" {% if p.id == edit8.position_id.id %}selected{% endif %}>{{ p.department_id.department }}/{{ p.positions }}</option>
+                    {% endfor %}
+                </select><br>
+                Worker's name:<br>
+                <input type="text" name="name" value="{{ edit8.name }}" class="form-control form-control-rounded"><br>
+                Worker's surname:<br>
+                <input type="text" name="surname" value="{{ edit8.surname }}" class="form-control form-control-rounded"><br>
+                Worker's email:<br>
+                <input type="text" name="email" value="{{ edit8.email }}" class="form-control form-control-rounded"><br>
+                Worker's telephone:<br>
+                <input type="text" name="telephone" value="{{ edit8.telephone }}" class="form-control form-control-rounded"><br>
+                Salary:<br>
+                <input type="text" name="salary" value="{{ edit8.salary }}" class="form-control form-control-rounded"><br>
+                Work start date:<br>
+                <input type="date" name="work" value="{{ edit8.work|date:'Y-m-d' }}" class="form-control form-control-rounded"><br>
+                <div class="form-group d-flex">
+                    <button type="submit" class="btn btn-light btn-round px-5" title="Update Staff"><i class="fas fa-sync"></i> </button>
+                    {% if request.user.is_superuser %}
+                    <a href="{% url 'staff'  %}" class="btn btn-light btn-round px-5" title="Cancel"><i class="fas fa-times"></i></a>
+                    {% else %}
+                    <a href="{% url 'staff' echeck request.user.id %}" class="btn btn-light btn-round px-5" title="Cancel"><i class="fas fa-times"></i></a>
+                    {% endif %}
+                </div>
+            </form><br>
+        </div>
+    {% else %}
+        <div class="card-body">
+            <div class="card-title">Add Staff</div>
+            <hr>
+            <form method="post" {% if request.user.is_superuser %}action="{% url 'staff' %}"{% else %} action="{% url 'staff' echeck request.user.id %}" {% endif %} enctype="multipart/form-data">
+                {% csrf_token %}
+                Staff's photo:<br>
+                <input type="file" name="photo" class="form-control form-control-rounded"><br>
+                Worker's title:<br>
+                <select name="position_id" class="form-control form-control-rounded">
+                    <option value="">Choose Title</option>
+                    {% for p in pinfo %}
+                        <option value="{{ p.id }}">{{ p.department_id.department }}/{{ p.positions }}</option>
+                    {% endfor %}
+                </select><br>
+                Worker's name:<br>
+                <input type="text" name="name" class="form-control form-control-rounded"><br>
+                Worker's surname:<br>
+                <input type="text" name="surname" class="form-control form-control-rounded"><br>
+                Worker's email:<br>
+                <input type="text" name="email" class="form-control form-control-rounded"><br>
+                Worker's telephone:<br>
+                <input type="text" name="telephone" class="form-control form-control-rounded"><br>
+                Salary:<br>
+                <input type="text" name="salary" class="form-control form-control-rounded"><br>
+                Work start date:<br>
+                <input type="date" name="work" class="form-control form-control-rounded"><br>
+                <input type="hidden" name="echeck" value="{{ echeck }}">
+                <div class="form-group">
+                    <button type="submit" class="btn btn-light btn-round px-5" title="Add staff"><i class="fas fa-check"></i></button>
+                    <a href="{% url 'export_staff_to_excel' %}" class="btn btn-light btn-round px-5" title="Export Expense">
+                        <i class="fa fa-file-excel"></i>
+                    </a>
+                </div>
+            </form><br>
+        </div>
+    {% endif %}
+    {% endif %}
+
+    You have <b>{{ say }}</b> staff in the base<br><br>
+
+    {% if info %}
+        {% if request.user.is_superuser %}
+            <form method="post"  action="{% url 'delete_selected_staff' %}">
+        {% else %}
+            {% if echeck %}
+                <form method="post"  action="{% url 'delete_selected_staff' echeck request.user.id %}">
+            {% elif vcheck %}
+                <form method="post"  action="{% url 'delete_selected_staff' vcheck request.user.id %}">
+            {% endif %}
+        {% endif %}
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Staff Table</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                {% if request.user.is_superuser or echeck %}
+                                <th scope="col">Checkbox</th>
+                                {% endif %}
+                                <th scope="col">№</th>
+                                <th scope="col">Title</th>
+                                <th scope="col">Photo</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Surname</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Telephone</th>
+                                <th scope="col">Salary</th>
+                                <th scope="col">Work Start Date</th>
+                                {% if request.user.is_superuser or echeck  %}
+                                    <th scope="col">Actions
+                                                <button type="submit" class="btn btn-danger btn-sm" name="secsil" {% if not info %}disabled{% endif %}>
+                                                    <i class="fas fa-trash-alt" title="Delete choosen staff"></i> 
+                                                </button>
+                                        </th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for staff in info %}
+                                <tr>
+                                    {% if request.user.is_superuser or echeck %}
+                                        <th><input type="checkbox" name="secim[]" value="{{staff.id}}"></th>
+                                    {% endif %}
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <td>{{ staff.position_id.department_id.department }}/{{ staff.position_id.positions }}</td>
+                                    <td>
+                                        <img src="{{ staff.photo }}" alt="{{ staff.name }} {{ staff.surname }}" width="150" height="150" class="circular-image">
+                                    </td>
+                                    <td>{{ staff.name }}</td>
+                                    <td>{{ staff.surname }}</td>
+                                    <td>{{ staff.email }}</td>
+                                    <td>{{ staff.telephone }}</td>
+                                    <td>{{ staff.salary }}</td>
+                                    <td>{{ staff.work|date:'Y-m-d' }}</td>
+                                    {% if  request.user.is_superuser or echeck %}
+                                    {% if request.user.is_superuser %}
+                                        <td>
+                                            <a href="{% url 'udalit8' staff.id %}">
+                                                <button type="button" class="btn btn-danger btn-round px-5" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </a>
+                                            <a href="{% url 'edit8'  staff.id %}">
+                                                <button type="button" class="btn btn-warning btn-round px-5" title="Edit">
+                                                    <i class="fas fa-pen"></i>
+                                                </button>
+                                            </a>     
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <a href="{% url 'udalit8' echeck staff.id  %}">
+                                                <button type="button" class="btn btn-danger btn-round px-5" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </a>
+                                            <a href="{% url 'edit8'  echeck staff.id %}">
+                                                <button type="button" class="btn btn-warning btn-round px-5" title="Edit">
+                                                    <i class="fas fa-pen"></i>
+                                                </button>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        </form>
+    {% endif %}
+{% endblock %}

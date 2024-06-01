@@ -1,0 +1,56 @@
+{% extends "menu.html" %}
+{% block title %}Manage rules{% endblock %}
+        {% block content %}
+        <div class="container">
+          <div class="form-group">
+            <label for="product">Control panel:</label>
+{{user_id}}
+            <form method="post">
+            {% csrf_token %}
+            <select name="user_id" class="form-control form-control-rounded" onchange="this.form.submit()">
+                <option value="">Choose User</option>
+                {% for user in all_users %}
+                      {% if user_id|add:"0"  == user.id %}
+                          <option selected value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
+                      {% else %}
+                          <option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
+                      {% endif %}
+                {% endfor %}
+            </select>
+
+
+              {% if user_id %}
+
+              <table class="table">
+                  <thead>
+                      <th>#</th>
+                      <th>İdarə etmə menyusu</th>
+                      <th>Cədvəl</th>
+                      <th>Baza əməliyatları</th>
+                  </thead>
+                  <tbody>
+                    {% for permission in permissione %}
+
+                          <tr>
+                              <td>{{ forloop.counter }}</td>
+                              <td>{{permission.name}}</td>
+                              <td>
+                                <input {% for x in permsone %} {% if x.item_id_id == permission.id and x.item_value == 0 %} checked {% endif %} {% endfor %} type="checkbox" name="secim[]" value="{{permission.id}}">
+                              </td>
+                              <td>
+                                <input {% for x in permsone %} {% if x.item_id_id == permission.id and x.item_value == 1 %} checked {% endif %} {% endfor %} type="checkbox" name="secim_value[]" value="{{ permission.id }}">                                </td>
+                          </tr>
+                      {% endfor %}
+  
+                  </tbody>
+              </table>
+              <button class="btn btn-primary" name="ok">Confirm</button>
+              {% endif %}
+           </form>
+          </div>
+        </div>
+        
+        {% endblock %}
+      <!-- End container-fluid-->
+      
+ 

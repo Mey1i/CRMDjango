@@ -1,0 +1,152 @@
+{% extends "menu.html" %}
+{% block title %}Stats{% endblock %}
+{% block content %}
+  <div class="card mt-3">
+      <div class="card-content">
+          <div class="row row-group m-0">
+          <div class="col-12 col-lg-6 col-xl-3 border-light">
+              <div class="card-body text-left mx-auto mb-3 mt-3">
+              <h3>
+                  <p class="mb-0 text-white big-font">
+                    <i class="fas fa-chart-bar"></i> Total Brands <span class="float-right">{{ bsay }}</span>
+                  </p>
+              </h3>
+              </div>
+          </div>
+          <div class="col-12 col-lg-6 col-xl-3 border-light">
+              <div class="card-body text-left mx-auto mb-3 mt-3">
+              <h3>
+                  <p class="mb-0 text-white big-font">
+                  <i class="fas fa-users"></i> Total Clients <span class="float-right">{{ csay }}</span>
+                  </p>
+              </h3>
+              </div>
+          </div>
+          <div class="col-12 col-lg-6 col-xl-3 border-light">
+              <div class="card-body text-left mx-auto mb-3 mt-3">
+              <h3>
+                  <p class="mb-0 text-white big-font">
+                  <i class="fas fa-building"></i> Total Departments <span class="float-right">{{ dsay }}</span>
+                  </p>
+              </h3>
+              </div>
+          </div>
+          <div class="col-12 col-lg-6 col-xl-3 border-light">
+              <div class="card-body text-left mx-auto mb-3 mt-3">
+              <h3>
+                  <p class="mb-0 text-white big-font">
+                  <i class="fas fa-money-bill"></i> Total Expenses <span class="float-right">{{ esay }}</span>
+                  </p>
+              </h3>
+              </div>
+          </div>
+          <div class="col-12 col-lg-6 col-xl-3 border-light">
+              <div class="card-body text-left mx-auto mb-3 mt-3">
+                <h3>
+                  <p class="mb-0 text-white big-font">
+                    <i class="fas fa-shopping-cart"></i> Total Orders <span class="float-right">{{ osay }}</span>
+                  </p>
+                </h3>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+              <div class="card-body text-left mx-auto mb-3 mt-3">
+                <h3>
+                  <p class="mb-0 text-white big-font">
+                    <i class="fas fa-tasks"></i> Total Tasks <span class="float-right">{{ tsay }}</span>
+                  </p>
+                </h3>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+              <div class="card-body text-left mx-auto mb-3 mt-3">
+                <h3>
+                  <p class="mb-0 text-white big-font">
+                    <i class="fas fa-user-tie"></i> Total Positions <span class="float-right">{{ psay }}</span>
+                  </p>
+                </h3>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+              <div class="card-body text-left mx-auto mb-3 mt-3">
+                <h3>
+                  <p class="mb-0 text-white big-font">
+                    <i class="fas fa-shopping-basket"></i> Total Products <span class="float-right">{{ prosay }}</span>
+                  </p>
+                </h3>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+              <div class="card-body text-left mx-auto mb-3 mt-3">
+                <h3>
+                  <p class="mb-0 text-white big-font">
+                    <i class="fas fa-users"></i> Total Staff <span class="float-right">{{ ssay }}</span>
+                  </p>
+                </h3>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+              <div class="card-body text-left mx-auto mb-3 mt-3">
+                <h3>
+                  <p class="mb-0 text-white big-font">
+                    <i class="fas fa-dolly"></i> Total Suppliers <span class="float-right">{{ supsay }}</span>
+                  </p>
+                </h3>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+              <div class="card-body text-left mx-auto mb-3 mt-3">
+                <h3>
+                  <p class="mb-0 text-white big-font">
+                    <i class="fas fa-money-bill"></i> Product's profit <span class="float-right"><h5>{{ qazanc }}</h5></span>
+                  </p>
+                </h3>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+              <div class="card-body text-left mx-auto mb-3 mt-3">
+                <h3>
+                  <p class="mb-0 text-white big-font">
+                    <i class="fas fa-arrow-up"></i> Active orders <span class="float-right">{{ active_count }}</span>
+                  </p>
+                </h3>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+              <div class="card-body text-left mx-auto mb-3 mt-3">
+                <h3>
+                  <p class="mb-0 text-white big-font">
+                    <i class="fas fa-check-circle"></i>Complete orders <span class="float-right">{{ complete_count }}</span>
+                  </p>
+                </h3>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+              <div class="card-body text-left mx-auto mb-3 mt-3">
+                <h3>
+                  <p class="mb-0 text-white big-font">
+                    <i class="fas fa-tasks"></i>Active tasks <span class="float-right">{{ active_tasks }}</span>
+                  </p>
+                </h3>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+              <div class="card-body text-left mx-auto mb-3 mt-3">
+                <h3>
+                  <p class="mb-0 text-white big-font">
+                    <i class="fas fa-check-square"></i>Complete tasks <span class="float-right">{{ complete_tasks }}</span>
+                  </p>
+                </h3>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+              <div class="card-body text-left mx-auto mb-3 mt-3">
+                <h3>
+                  <p class="mb-0 text-white big-font">
+                    <i class="fas fa-user-friends"></i>Number of users <span class="float-right">{{ quantity_users }}</span>
+                  </p>
+                </h3>
+              </div>
+            </div>
+
+{% endblock %}
